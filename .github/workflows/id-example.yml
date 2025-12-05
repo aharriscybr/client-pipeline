@@ -12,10 +12,11 @@ permissions:
   contents: read
 
 jobs:
-  test-retrieve:
+  stage-secrets:
     runs-on: [ ubuntu-latest ] # only use self-hosted, this is a poc.
     steps:
       - name: Stage Secrets
+        id: cyberark
         env:
           CONJUR_URL: "https://sme-andrew.secretsmgr.cyberark.cloud/api"
           CONJUR_ACCOUNT: "conjur"
@@ -38,4 +39,11 @@ jobs:
           done
           api_path="${path:0:${#path}-1}"          
           
-          echo "$api_path"
+          variables=$(curl -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets?variable_ids=$api_path" | jq .)
+          variables_b64=$(curl -H "Authorization:Token token=\"${SESSION_TOKEN}\"" -H "Accept-Encoding:base64" "$CONJUR_URL/secrets?variable_ids=$api_path" | jq .)
+
+          echo $variables >> $GITHUB_OUTPUT
+          echo $variables_b64
+      - name: Consume Secrets
+        run: |
+          echo "${{ steps.cyberark.variables }}"
