@@ -51,4 +51,4 @@ jobs:
     steps:
       - name: Testing Credentials
         run: |
-          echo '${{ toJSON(needs.stage-secrets.outputs) }}'
+          echo '${{ toJSON(needs.stage-secrets.outputs) }} | jq .'
