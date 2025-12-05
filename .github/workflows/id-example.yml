@@ -40,10 +40,8 @@ jobs:
           api_path="${path:0:${#path}-1}"          
           
           variables=$(curl -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets?variable_ids=$api_path" | jq .)
-          variables_b64=$(curl -H "Authorization:Token token=\"${SESSION_TOKEN}\"" -H "Accept-Encoding:base64" "$CONJUR_URL/secrets?variable_ids=$api_path" | jq .)
 
-          echo $variables >> $GITHUB_OUTPUT
-          echo $variables_b64
+          echo "creds=$variables" >> "$GITHUB_OUTPUT"
       - name: Consume Secrets
         run: |
           echo "${{ steps.cyberark.variables }}" | jq .
