@@ -14,6 +14,8 @@ permissions:
 jobs:
   stage-secrets:
     runs-on: [ ubuntu-latest ] # only use self-hosted, this is a poc.
+    outputs:
+      creds: ${{ steps.cyberark.outputs.secrets }}
     steps:
       - name: Stage Secrets
         id: cyberark
@@ -41,7 +43,12 @@ jobs:
           
           variables=$(curl -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets?variable_ids=$api_path")
 
-          echo "creds=$variables" >> "$GITHUB_OUTPUT"
-      - name: Consume Secrets
-        run: |
-          echo "${{ needs.cyberark.creds }}" | jq .
+          echo "secrets=$variables" >> "$GITHUB_OUTPUT"
+
+  demo:
+    runs-on: [ ubuntu-latest ] # only use self-hosted, this is a poc.
+    needs: [stage-secrets]
+    steps:
+      name: Testing Credentials
+      run: |
+        echo '${{ needs.stage-secrets.outputs }}'
