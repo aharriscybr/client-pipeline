@@ -6,6 +6,10 @@ on:
         description: 'Object Query to retrieve from Secrets Manager SaaS'
         required: true
         default: ''
+      encode:
+        description: 'Do you want the returned credential object values b64 encoded?'
+        requred: false
+        default: 'false'
 
 permissions:
   id-token: write
@@ -41,7 +45,7 @@ jobs:
           done
           api_path="${path:0:${#path}-1}"          
           
-          variables=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets?variable_ids=$api_path")
+          variables=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets?variable_ids=$api_path" | jq .)
 
           echo "secrets=$variables" >> "$GITHUB_OUTPUT"
 
@@ -51,4 +55,4 @@ jobs:
     steps:
       - name: Testing Credentials
         run: |
-          echo '${{ toJSON(needs.stage-secrets.outputs) }} | jq .'
+          echo '${{ toJSON(needs.stage-secrets.outputs) }}'
