@@ -2,33 +2,39 @@ name: Pipeline Demo
 on:
   workflow_dispatch:
     inputs:
-      object:
+      query_object:
         description: 'Object Query to retrieve from Secrets Manager SaaS'
         required: true
         default: ''
+      encode:
+        description: 'Do you want the returned credential object values b64 encoded?'
+        requred: false
+        default: 'false'
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  test-retrieve:
+  stage-secrets:
     runs-on: [ ubuntu-latest ] # only use self-hosted, this is a poc.
+    outputs:
+      creds: ${{ steps.cyberark.outputs.secrets }}
     steps:
       - name: Stage Secrets
+        id: cyberark
         env:
           CONJUR_URL: "https://sme-andrew.secretsmgr.cyberark.cloud/api"
           CONJUR_ACCOUNT: "conjur"
           CONJUR_SERVICE_ID: "github"
         run: |
-          set -x
           echo "Retrieving JWT Token from Github"
           GIT_TOKEN=$(curl -s -H "Authorization:bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r .value)
 
           echo "Authenticating to Conjur"
-          SESSION_TOKEN=$(curl -v --request POST "$CONJUR_URL/authn-jwt/$CONJUR_SERVICE_ID/$CONJUR_ACCOUNT/authenticate" --header "Content-Type: application/x-www-form-urlencoded" --header "Accept-Encoding: base64" --data-urlencode "jwt=$GIT_TOKEN")
+          SESSION_TOKEN=$(curl -s --request POST "$CONJUR_URL/authn-jwt/$CONJUR_SERVICE_ID/$CONJUR_ACCOUNT/authenticate" --header "Content-Type: application/x-www-form-urlencoded" --header "Accept-Encoding: base64" --data-urlencode "jwt=$GIT_TOKEN")
           
-          resources=$(curl -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/resources/$CONJUR_ACCOUNT?kind=variable&search=${{ github.event.inputs.environment }}" | jq -r '.[].id')
+          resources=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/resources/$CONJUR_ACCOUNT?kind=variable&search=${{ github.event.inputs.query_object }}" | jq -r '.[].id')
 
           paths=""
           
@@ -38,4 +44,14 @@ jobs:
           done
           api_path="${path:0:${#path}-1}"          
           
-          echo "$api_path"
+          variables=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets?variable_ids=$api_path")
+
+          echo "secrets=$variables" >> "$GITHUB_OUTPUT"
+
+  demo:
+    runs-on: [ ubuntu-latest ] # only use self-hosted, this is a poc.
+    needs: [stage-secrets]
+    steps:
+      - name: Testing Credentials
+        run: |
+          echo "${{ needs.stage-secrets.outputs.creds }}"
