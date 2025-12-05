@@ -43,5 +43,7 @@ jobs:
 
           echo "creds=$variables" >> "$GITHUB_OUTPUT"
       - name: Consume Secrets
+        needs: 
+          - cyberark
         run: |
-          echo "${{ steps.cyberark.creds }}" | jq .
+          echo "${{ needs.cyberark.creds }}" | jq .
