@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   test-retrieve:
-    runs-on: [ ubuntu ] # only use self-hosted, this is a poc.
+    runs-on: [ ubuntu-latest ] # only use self-hosted, this is a poc.
     steps:
       - name: Stage Secrets
         env:
@@ -38,4 +38,4 @@ jobs:
           done
           api_path="${path:0:${#path}-1}"          
           
-          echo $api_path
+          echo "$api_path"
