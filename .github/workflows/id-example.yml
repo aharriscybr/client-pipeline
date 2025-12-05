@@ -46,4 +46,4 @@ jobs:
           echo $variables_b64
       - name: Consume Secrets
         run: |
-          echo "${{ steps.cyberark.variables }}"
+          echo "${{ steps.cyberark.variables }}" | jq .
