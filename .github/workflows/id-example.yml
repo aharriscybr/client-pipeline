@@ -28,7 +28,7 @@ jobs:
           echo "Authenticating to Conjur"
           SESSION_TOKEN=$(curl -v --request POST "$CONJUR_URL/authn-jwt/$CONJUR_SERVICE_ID/$CONJUR_ACCOUNT/authenticate" --header "Content-Type: application/x-www-form-urlencoded" --header "Accept-Encoding: base64" --data-urlencode "jwt=$GIT_TOKEN")
           
-          resources=$(curl -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/resources/$CONJUR_ACCOUNT?kind=variable&search=$OBJECT_NAME" | jq -r '.[].id')
+          resources=$(curl -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/resources/$CONJUR_ACCOUNT?kind=variable&search=${{ github.event.inputs.environment }}" | jq -r '.[].id')
 
           paths=""
           
