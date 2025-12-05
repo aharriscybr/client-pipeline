@@ -49,6 +49,6 @@ jobs:
     runs-on: [ ubuntu-latest ] # only use self-hosted, this is a poc.
     needs: [stage-secrets]
     steps:
-      name: Testing Credentials
-      run: |
-        echo '${{ needs.stage-secrets.outputs }}'
+      - name: Testing Credentials
+        run: |
+          echo '${{ needs.stage-secrets.outputs }}'
