@@ -1,0 +1,41 @@
+name: Pipeline Demo
+on:
+  workflow_dispatch:
+    inputs:
+      object:
+        description: 'Object Query to retrieve from Secrets Manager SaaS'
+        required: true
+        default: ''
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  test-retrieve:
+    runs-on: [ ubuntu ] # only use self-hosted, this is a poc.
+    steps:
+      - name: Stage Secrets
+        env:
+          CONJUR_URL: "https://sme-andrew.secretsmgr.cyberark.cloud/api"
+          CONJUR_ACCOUNT: "conjur"
+          CONJUR_SERVICE_ID: "github"
+        run: |
+          set -x
+          echo "Retrieving JWT Token from Github"
+          GIT_TOKEN=$(curl -s -H "Authorization:bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r .value)
+
+          echo "Authenticating to Conjur"
+          SESSION_TOKEN=$(curl -v --request POST "$CONJUR_URL/authn-jwt/$CONJUR_SERVICE_ID/$CONJUR_ACCOUNT/authenticate" --header "Content-Type: application/x-www-form-urlencoded" --header "Accept-Encoding: base64" --data-urlencode "jwt=$GIT_TOKEN")
+          
+          resources=$(curl -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/resources/$CONJUR_ACCOUNT?kind=variable&search=$OBJECT_NAME" | jq -r '.[].id')
+
+          paths=""
+          
+          for resource in $resources
+          do
+              path+="${resource},"
+          done
+          api_path="${path:0:${#path}-1}"          
+          
+          echo $api_path
