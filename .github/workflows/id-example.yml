@@ -47,7 +47,9 @@ jobs:
           
           variables=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets?variable_ids=$api_path" | jq .)
 
-          echo "secrets=$variables" >> "$GITHUB_OUTPUT"
+          echo "secrets=$(cat <<EOF
+          $variables
+          EOF)" >> "$GITHUB_OUTPUT"
 
   demo:
     runs-on: [ ubuntu-latest ] # only use self-hosted, this is a poc.
