@@ -46,8 +46,8 @@ jobs:
           api_path="${path:0:${#path}-1}"          
           
           #variables=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets?variable_ids=$api_path")
-          username=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets/conjur/variable/data/vault/aam_deposits/truffle/username)
-          password=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets/conjur/variable/data/vault/aam_deposits/truffle/password)
+          username=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets/conjur/variable/data/vault/aam_deposits/truffle/username")
+          password=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets/conjur/variable/data/vault/aam_deposits/truffle/password")
 
           echo "cyberark_username=$username" >> "$GITHUB_OUTPUT"
           echo "cyberark_password=$password" >> "$GITHUB_OUTPUT"
