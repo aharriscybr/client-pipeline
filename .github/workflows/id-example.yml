@@ -22,7 +22,7 @@ jobs:
       cyberark_username: ${{ steps.cyberark.outputs.cyberark_username }}
       cyberark_password: ${{ steps.cyberark.outputs.cyberark_password }}
       vars: ${{ steps.cyberark.outputs.vars }}
-      something_totally_different: ${{ steps.cyberark.output.something_totally_different }}
+      something_totally_different: ${{ steps.cyberark.outputs.something_totally_different }}
     steps:
       - name: Stage Secrets
         id: cyberark
