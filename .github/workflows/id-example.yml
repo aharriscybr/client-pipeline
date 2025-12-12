@@ -8,7 +8,7 @@ on:
         default: ''
       encode:
         description: 'Do you want the returned credential object values b64 encoded?'
-        requred: false
+        required: false
         default: 'false'
 
 permissions:
@@ -22,7 +22,7 @@ jobs:
       cyberark_username: ${{ steps.cyberark.outputs.cyberark_username }}
       cyberark_password: ${{ steps.cyberark.outputs.cyberark_password }}
       vars: ${{ steps.cyberark.outputs.vars }}
-      something_totally-different: ${{ steps.cyberark.output.something_totally-different }}
+      something_totally_different: ${{ steps.cyberark.output.something_totally_different }}
     steps:
       - name: Stage Secrets
         id: cyberark
@@ -66,4 +66,4 @@ jobs:
           echo "username: ${{ needs.stage-secrets.outputs.cyberark_username }}"
           echo "password: ${{ needs.stage-secrets.outputs.cyberark_password }}"
           echo "variables: ${{ needs.stage-secrets.outputs.vars }}"
-          echo "addy: ${{ needs.stage-secrets.outputs.something_totally-different }}"
+          echo "addy: ${{ needs.stage-secrets.outputs.something_totally_different }}"
