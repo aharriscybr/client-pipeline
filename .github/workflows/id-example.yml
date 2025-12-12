@@ -54,7 +54,7 @@ jobs:
 
           echo "cyberark_username=$username" >> "$GITHUB_OUTPUT"
           echo "cyberark_password=$password" >> "$GITHUB_OUTPUT"
-          echo "something_totally-different=$address" >> "$GITHUB_OUTPUT"
+          echo "something_totally_different=$address" >> "$GITHUB_OUTPUT"
           echo "vars=$variables" >> "$GITHUB_OUTPUT"
 
   demo:
