@@ -21,6 +21,7 @@ jobs:
     outputs:
       cyberark_username: ${{ steps.cyberark.outputs.cyberark_username }}
       cyberark_password: ${{ steps.cyberark.outputs.cyberark_password }}
+      vars: ${{ steps.cyberark.outputs.vars }}
     steps:
       - name: Stage Secrets
         id: cyberark
@@ -45,12 +46,13 @@ jobs:
           done
           api_path="${path:0:${#path}-1}"          
           
-          #variables=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets?variable_ids=$api_path")
-          username=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets/conjur/variable/data/vault/aam_deposits/truffle/username")
-          password=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets/conjur/variable/data/vault/aam_deposits/truffle/password")
+          variables=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets?variable_ids=$api_path")
+          username=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets/conjur/variable/data/vault/aam_deposits/${{ github.event.inputs.query_object }}/username")
+          password=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets/conjur/variable/data/vault/aam_deposits/${{ github.event.inputs.query_object }}/password")
 
           echo "cyberark_username=$username" >> "$GITHUB_OUTPUT"
           echo "cyberark_password=$password" >> "$GITHUB_OUTPUT"
+          echo "vars=$variables" >> "$GITHUB_OUTPUT"
 
   demo:
     runs-on: [ ubuntu-latest ] # only use self-hosted, this is a poc.
@@ -60,3 +62,4 @@ jobs:
         run: |
           echo "username: ${{ needs.stage-secrets.outputs.cyberark_username }}"
           echo "password: ${{ needs.stage-secrets.outputs.cyberark_password }}"
+          echo "variables: ${{ needs.stage-secrets.outputs.vars }}"
