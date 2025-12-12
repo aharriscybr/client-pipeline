@@ -22,6 +22,7 @@ jobs:
       cyberark_username: ${{ steps.cyberark.outputs.cyberark_username }}
       cyberark_password: ${{ steps.cyberark.outputs.cyberark_password }}
       vars: ${{ steps.cyberark.outputs.vars }}
+      something_totally-different: ${{ steps.cyberark.output.something_totally-different }}
     steps:
       - name: Stage Secrets
         id: cyberark
@@ -49,9 +50,11 @@ jobs:
           variables=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets?variable_ids=$api_path")
           username=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets/conjur/variable/data/vault/aam_deposits/${{ github.event.inputs.query_object }}/username")
           password=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets/conjur/variable/data/vault/aam_deposits/${{ github.event.inputs.query_object }}/password")
+          address=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets/conjur/variable/data/vault/aam_deposits/${{ github.event.inputs.query_object }}/address")
 
           echo "cyberark_username=$username" >> "$GITHUB_OUTPUT"
           echo "cyberark_password=$password" >> "$GITHUB_OUTPUT"
+          echo "something_totally-different=$address" >> "$GITHUB_OUTPUT"
           echo "vars=$variables" >> "$GITHUB_OUTPUT"
 
   demo:
@@ -63,3 +66,4 @@ jobs:
           echo "username: ${{ needs.stage-secrets.outputs.cyberark_username }}"
           echo "password: ${{ needs.stage-secrets.outputs.cyberark_password }}"
           echo "variables: ${{ needs.stage-secrets.outputs.vars }}"
+          echo "addy: ${{ needs.stage-secrets.outputs.something_totally-different }}"
