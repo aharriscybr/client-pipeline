@@ -23,6 +23,7 @@ jobs:
       cyberark_password: ${{ steps.cyberark.outputs.cyberark_password }}
       vars: ${{ steps.cyberark.outputs.vars }}
       something_totally_different: ${{ steps.cyberark.outputs.something_totally_different }}
+      my_special_database: ${{ steps.cyberark.outputs.databaseName }} 
     steps:
       - name: Stage Secrets
         id: cyberark
@@ -51,11 +52,13 @@ jobs:
           username=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets/conjur/variable/data/vault/aam_deposits/${{ github.event.inputs.query_object }}/username")
           password=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets/conjur/variable/data/vault/aam_deposits/${{ github.event.inputs.query_object }}/password")
           address=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets/conjur/variable/data/vault/aam_deposits/${{ github.event.inputs.query_object }}/address")
+          db_name=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/secrets/conjur/variable/data/vault/aam_deposits/${{ github.event.inputs.query_object }}/Database")
 
           echo "cyberark_username=$username" >> "$GITHUB_OUTPUT"
           echo "cyberark_password=$password" >> "$GITHUB_OUTPUT"
           echo "something_totally_different=$address" >> "$GITHUB_OUTPUT"
           echo "vars=$variables" >> "$GITHUB_OUTPUT"
+          echo "databaseName=$db_name" >> "$GITHUB_OUTPUT"
 
   demo:
     runs-on: [ ubuntu-latest ] # only use self-hosted, this is a poc.
@@ -65,5 +68,5 @@ jobs:
         run: |
           echo "username: ${{ needs.stage-secrets.outputs.cyberark_username }}"
           echo "password: ${{ needs.stage-secrets.outputs.cyberark_password }}"
-          echo "variables: ${{ needs.stage-secrets.outputs.vars }}"
+          echo "databaz: ${{ needs.stage-secrets.outputs.my_special_database }}"
           echo "addy: ${{ needs.stage-secrets.outputs.something_totally_different }}"
