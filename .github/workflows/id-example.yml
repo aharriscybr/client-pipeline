@@ -40,7 +40,7 @@ jobs:
           
           resources=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/resources/$CONJUR_ACCOUNT?kind=variable&search=${{ github.event.inputs.query_object }}" | jq -r '.[].id')
 
-          cnt=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/resources/$CONJUR_ACCOUNT?kind=variable&count=true)
+          cnt=$(curl -s -H "Authorization:Token token=\"${SESSION_TOKEN}\"" "$CONJUR_URL/resources/$CONJUR_ACCOUNT?kind=variable&count=true")
 
           echo $cnt
 
